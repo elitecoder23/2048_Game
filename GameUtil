@@ -1,0 +1,159 @@
+package hw3;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import api.Tile;
+
+
+
+/**
+ * Utility class with static methods for saving and loading game files.
+ */
+public class GameFileUtil {
+	/**
+	 * Saves the current game state to a file at the given file path.
+	 * <p>
+	 * The format of the file is one line of game data followed by multiple lines of
+	 * game grid. The first line contains the: width, height, minimum tile level,
+	 * maximum tile level, and score. The grid is represented by tile levels. The
+	 * conversion to tile values is 2^level, for example, 1 is 2, 2 is 4, 3 is 8, 4
+	 * is 16, etc. The following is an example:
+	 * 
+	 * <pre>
+	 * 5 8 1 4 100
+	 * 1 1 2 3 1
+	 * 2 3 3 1 3
+	 * 3 3 1 2 2
+	 * 3 1 1 3 1
+	 * 2 1 3 1 2
+	 * 2 1 1 3 1
+	 * 4 1 3 1 1
+	 * 1 3 3 3 3
+	 * </pre>
+	 * 
+	 * @param filePath the path of the file to save
+	 * @param game     the game to save
+	 */
+	public static void save(String filePath, ConnectGame game) {
+		try {
+			BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
+			
+			// TODO: write to file, can use writer.write()
+			
+			Grid completeFormat = game.getGrid();
+			
+			int tileW = completeFormat.getWidth();
+			
+			int tileH = completeFormat.getHeight();
+			
+			int levBottom = game.getMinTileLevel();
+			
+			int levTop = game.getMaxTileLevel();
+			
+			long endingSc = game.getScore();
+			
+			writer.write(tileW + " " + tileH + " " + levBottom + " " + levTop + " " + endingSc);
+			
+			for (int y = 0; y < tileH; y++)
+			{
+				writer.write('\n');
+				
+				for (int horizontal = 0; horizontal < tileW; horizontal++)
+				{
+					Tile tt = completeFormat.getTile(horizontal, y);
+					
+					if (tt != null 
+							&& horizontal == tileW - 1)
+						
+					{
+						writer.write(tt.getLevel() + "");
+					}
+					else if (tt != null)
+						
+					{
+						writer.write(tt.getLevel() + " ");
+					}
+					else
+						
+					{
+						writer.write("0 ");
+					}
+				}
+			}
+			
+			
+			
+			
+			writer.close();
+			
+		} 
+		
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Loads the file at the given file path into the given game object. When the
+	 * method returns the game object has been modified to represent the loaded
+	 * game.
+	 * <p>
+	 * See the save() method for the specification of the file format.
+	 * 
+	 * @param filePath the path of the file to load
+	 * @param game     the game to modify
+	 */
+	public static void load(String filePath, ConnectGame game) {
+		try (BufferedReader reader = new BufferedReader(new FileReader(filePath)))
+		{
+			String[] tokDat = reader.readLine().split(" ");
+			
+			int x = Integer.parseInt(tokDat[0]);
+			
+			int y = Integer.parseInt(tokDat[1]);
+			
+			int gridMin = Integer.parseInt(tokDat[2]);
+			
+			int gridMax = Integer.parseInt(tokDat[3]);
+			
+			int finalScor = Integer.parseInt(tokDat[4]);
+			
+			Grid baseGr = new Grid(x, y);
+			
+			game.setMinTileLevel(gridMin);
+			
+			game.setMaxTileLevel(gridMax);
+			
+			game.setScore(finalScor);
+			
+			//Read game grid from file
+			baseGr = new Grid(x, y);
+			
+			for (int horizontal = 0; horizontal < y; horizontal++)
+			{
+				String[] individualToken = reader.readLine().split(" ");
+				
+				for (int vertical = 0; vertical < x; vertical++)
+				{
+					int currLev = Integer.parseInt(individualToken[vertical]);
+					
+					Tile gridSpace = new Tile(currLev);
+					
+					baseGr.setTile(gridSpace, vertical, horizontal);
+				}
+			}
+			
+			game.setGrid(baseGr);
+		}
+		
+		catch (IOException e)
+		
+		{
+			e.printStackTrace();
+		}
+	}
+	}
