@@ -74,7 +74,7 @@ public class Grid {
 	 */
 	public void setTile(Tile tile, int x, int y) {
 		
-		tile.setLocation(y,x);
+		tile.setLocation(x,y);
 		
 		tileGrid[y][x] = tile;
 		
